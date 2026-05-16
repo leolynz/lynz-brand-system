@@ -9,6 +9,8 @@ interface TokenTableProps {
 }
 
 export function TokenTable({ tokens }: TokenTableProps) {
+  if (!tokens?.length) return null
+
   return (
     <div className="my-6 overflow-hidden rounded-lg border border-neutral-200">
       <table className="w-full text-sm">
