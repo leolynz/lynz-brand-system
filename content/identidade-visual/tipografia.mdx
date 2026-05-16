@@ -1,0 +1,65 @@
+---
+title: "Tipografia"
+description: "O sistema tipográfico da Lynz — famílias, hierarquia, escalas e regras de uso."
+slug: "tipografia"
+category: "identidade-visual"
+order: 2
+publishedAt: "2026-05-16"
+---
+
+<Callout type="warning" title="Identidade visual em definição">
+  A tipografia final da Lynz será definida junto com a identidade visual completa. A fonte Inter é utilizada provisoriamente no Brand System.
+</Callout>
+
+## Fonte Primária — Inter
+
+Inter é uma fonte sans-serif de alta legibilidade, projetada especificamente para interfaces digitais. Suporta variação dinâmica de peso via `font-weight`.
+
+**Por que Inter:**
+- Legibilidade excepcional em tamanhos pequenos
+- Amplamente usada em design systems (Linear, Vercel, Notion)
+- Suporte a caracteres especiais do português
+- Variable font — um único arquivo cobre todos os pesos
+
+## Hierarquia Tipográfica
+
+<TokenTable
+  tokens={[
+    { name: "H1 — Título de página", value: "2.25rem / 700 / lh 1.2", description: "Título de diretrizes, cabeçalhos principais" },
+    { name: "H2 — Subtítulo de seção", value: "1.5rem / 600 / lh 1.3", description: "Seções dentro do conteúdo MDX" },
+    { name: "H3 — Sub-seção", value: "1.25rem / 600 / lh 1.4", description: "Agrupamentos dentro de seções" },
+    { name: "Body — Texto padrão", value: "1rem / 400 / lh 1.6", description: "Parágrafos de conteúdo" },
+    { name: "Body Small — Auxiliar", value: "0.875rem / 400 / lh 1.5", description: "Labels, legendas, metadados" },
+    { name: "Caption — Informação auxiliar", value: "0.75rem / 400 / lh 1.4", description: "Tooltips, notas de rodapé" },
+    { name: "Code — Código inline", value: "0.875rem / 400 / lh 1.6", description: "Tokens, nomes de variáveis" },
+  ]}
+/>
+
+## Fonte Monospace — JetBrains Mono
+
+Para blocos de código, tokens de design e valores técnicos.
+
+**Uso:** qualquer conteúdo que precise distinguir visualmente dados técnicos do texto corrido — hex de cores, nomes de tokens, exemplos de código.
+
+## Regras de Uso
+
+<DoAndDont
+  doLabel="Correto"
+  dontLabel="Incorreto"
+  doExample={
+    <div className="text-sm space-y-1">
+      <p className="font-semibold text-base">Título com peso 600</p>
+      <p className="text-neutral-600">Corpo do texto com peso 400 e line-height generosa para leitura confortável.</p>
+    </div>
+  }
+  dontExample={
+    <div className="text-sm space-y-1">
+      <p className="font-bold uppercase tracking-widest text-xs">TÍTULO EM CAPS COM BOLD</p>
+      <p className="font-bold">Corpo em negrito que compete com o título.</p>
+    </div>
+  }
+/>
+
+<Callout type="info" title="Princípio tipográfico">
+  A hierarquia tipográfica deve criar contraste claro entre níveis. Nunca use dois pesos adjacentes sem diferença mínima de um nível (ex: 400 e 500 lado a lado criam ruído, não hierarquia).
+</Callout>

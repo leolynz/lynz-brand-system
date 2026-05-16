@@ -1,0 +1,72 @@
+---
+title: "Paleta de Cores"
+description: "As cores primárias, secundárias e neutras da Lynz e suas regras de uso."
+slug: "cores"
+category: "identidade-visual"
+order: 1
+publishedAt: "2026-05-16"
+---
+
+<Callout type="warning" title="Identidade visual em definição">
+  A identidade visual da Lynz está em processo de desenvolvimento. Os valores de cor abaixo são provisórios e serão atualizados quando a paleta oficial for aprovada.
+</Callout>
+
+## Cor Primária
+
+A cor primária ancora toda a comunicação visual da Lynz. Deve transmitir confiança, clareza e profundidade.
+
+<ColorSwatch
+  name="Lynz Blue"
+  hex="#0047FF"
+  label="Primária"
+  variants={[
+    { shade: "900", hex: "#0030CC" },
+    { shade: "700", hex: "#0047FF" },
+    { shade: "500", hex: "#3370FF" },
+    { shade: "300", hex: "#80A8FF" },
+    { shade: "100", hex: "#D6E4FF" },
+  ]}
+/>
+
+## Cor Secundária
+
+A cor secundária complementa a primária em elementos de destaque, gradientes e momentos de energia.
+
+<ColorSwatch
+  name="Lynz Cyan"
+  hex="#00D4FF"
+  label="Secundária"
+/>
+
+## Neutros
+
+Os neutros são a base da interface e do conteúdo. Predominam em textos, fundos e estrutura.
+
+<ColorSwatch name="Preto" hex="#0A0A0A" label="Neutro 900" />
+<ColorSwatch name="Cinza Escuro" hex="#404040" label="Neutro 600" />
+<ColorSwatch name="Cinza Médio" hex="#737373" label="Neutro 400" />
+<ColorSwatch name="Cinza Claro" hex="#E5E5E5" label="Neutro 200" />
+<ColorSwatch name="Branco" hex="#FFFFFF" label="Neutro 0" />
+
+## Regras de Uso
+
+<DoAndDont
+  doLabel="Correto"
+  dontLabel="Incorreto"
+  doExample={<p className="text-sm">Use a cor primária sobre fundo branco ou cinza muito claro para garantir contraste mínimo de 4.5:1.</p>}
+  dontExample={<p className="text-sm">Nunca use a cor primária sobre fundos coloridos ou escuros sem verificar o contraste.</p>}
+/>
+
+## Tokens de Cor
+
+<TokenTable
+  tokens={[
+    { name: "--color-brand-primary", value: "#0047FF", description: "Cor de ação principal, botões, links ativos" },
+    { name: "--color-brand-secondary", value: "#00D4FF", description: "Gradientes, destaques energéticos" },
+    { name: "--color-background", value: "#FFFFFF", description: "Fundo principal da interface" },
+    { name: "--color-surface", value: "#F5F5F5", description: "Cards, sidebar, superfícies elevadas" },
+    { name: "--color-border", value: "#E5E5E5", description: "Bordas e divisores" },
+    { name: "--color-text-primary", value: "#0A0A0A", description: "Texto principal" },
+    { name: "--color-text-secondary", value: "#737373", description: "Texto auxiliar, legendas" },
+  ]}
+/>
