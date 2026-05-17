@@ -40,6 +40,7 @@ export function SignupForm() {
     })
 
     if (error) {
+      console.error('Signup error details:', error)
       setError(error.message)
       setLoading(false)
     } else {
