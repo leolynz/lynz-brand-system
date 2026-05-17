@@ -93,16 +93,30 @@
 
 ## O que não está implementado (planejado para fases futuras)
 
-### Fase 2 — Autenticação (não iniciada)
-- Integração com Supabase Auth
-- Página de login (`/login`)
-- Middleware de proteção de rotas
-- Gerenciamento de sessão e logout
+### Fase 2 — Autenticação
 
-### Fase 3 — Banco de dados e storage (não iniciada)
-- Integração com Supabase PostgreSQL
-- Upload e listagem de assets via Supabase Storage
-- Editor de conteúdo in-browser
+**Objetivo:** proteger o acesso ao conteúdo, permitindo controle de quem pode visualizar as diretrizes.
+
+| Funcionalidade | Status | Descrição |
+|---|---|---|
+| Integração com Supabase Auth | ✅ | Configuração do cliente Supabase e variáveis de ambiente |
+| Página de login | ✅ | Interface de autenticação com e-mail e senha em `/login` |
+| Proteção de rotas | ✅ | Middleware Next.js que redireciona usuários não autenticados |
+| Sessão persistente | ✅ | Manutenção da sessão do usuário via cookies (SSR) |
+| Logout | ✅ | Ação de encerramento de sessão na Sidebar |
+| Feedback de erro de autenticação | ✅ | Mensagens claras para credenciais inválidas e estado de sucesso no signup |
+
+### Fase 3 — Banco de Dados e Storage
+
+**Objetivo:** permitir gerenciamento dinâmico de conteúdo e assets diretamente pela interface.
+
+| Funcionalidade | Status | Descrição |
+|---|---|---|
+| Integração com Supabase Database | ✅ | Tabelas `profiles` e `assets` criadas via migrations |
+| Upload de assets | ✅ | Interface em `/assets/[type]` conectada ao Storage |
+| Listagem de assets | ✅ | Visualização dos arquivos armazenados por categoria |
+| Edição de usuários | ✅ | Admin Settings em `/settings` para gerenciar permissões |
+| Edição de conteúdo via interface | ❌ | Planejado para fases futuras |
 
 ### Fase 4 — Produção (parcialmente iniciada)
 - Deploy na Vercel: ✅ Funcionando

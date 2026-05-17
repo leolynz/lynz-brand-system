@@ -56,12 +56,15 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Protected routes
-  const isProtectedRoute = request.nextUrl.pathname.startsWith('/docs') || 
-                          request.nextUrl.pathname.startsWith('/assets') ||
-                          request.nextUrl.pathname.startsWith('/settings')
+  const isAuthRoute = request.nextUrl.pathname === '/login' || 
+                      request.nextUrl.pathname === '/signup'
+  
+  const isPublicRoute = isAuthRoute || 
+                        request.nextUrl.pathname.startsWith('/_next') ||
+                        request.nextUrl.pathname.includes('.') // for favicon, etc.
 
-  if (isProtectedRoute && !user) {
+  // If not logged in and not on a public route, redirect to login
+  if (!user && !isPublicRoute) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
