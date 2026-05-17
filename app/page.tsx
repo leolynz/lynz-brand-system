@@ -67,6 +67,21 @@ export default async function HomePage() {
                 </Link>
               ) : null
             )}
+
+            <Link
+              href="/assets"
+              className="group flex flex-col gap-2 p-5 rounded-xl border border-neutral-200 hover:border-neutral-400 hover:bg-neutral-50 transition-all duration-150"
+            >
+              <span className="text-xs font-semibold uppercase tracking-widest text-neutral-400">
+                Ativos da Marca
+              </span>
+              <p className="text-sm text-neutral-600 leading-relaxed">
+                Logotipos, cores, tipografia, imagens, vídeos, áudios, PDFs e ícones.
+              </p>
+              <span className="text-xs text-neutral-400 group-hover:text-neutral-600 transition-colors mt-1">
+                Gerenciar ativos →
+              </span>
+            </Link>
           </div>
         </div>
       </main>
