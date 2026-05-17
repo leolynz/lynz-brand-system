@@ -5,11 +5,7 @@ import { AssetCard } from '@/components/assets/AssetCard'
 import { ASSET_CATEGORIES, AssetCategory } from '@/lib/constants'
 import { notFound } from 'next/navigation'
 
-interface PageProps {
-  params: {
-    type: string
-  }
-}
+export const dynamic = 'force-dynamic'
 
 export default async function AssetCategoryPage({ params }: PageProps) {
   const category = params.type as AssetCategory
