@@ -7,6 +7,12 @@ import { notFound } from 'next/navigation'
 
 export const dynamic = 'force-dynamic'
 
+interface PageProps {
+  params: {
+    type: string
+  }
+}
+
 export default async function AssetCategoryPage({ params }: PageProps) {
   const category = params.type as AssetCategory
   const categoryData = ASSET_CATEGORIES[category]
