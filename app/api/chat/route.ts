@@ -27,7 +27,7 @@ export async function POST(req: Request) {
     console.log('Server-side check - Available keys:', availableKeys);
     console.log('Brand Context size:', brandContext?.length || 0);
     
-    const apiKey = process.env.OPENROUTER_API_KEY;
+    let apiKey = process.env.OPENROUTER_API_KEY;
     
     if (!apiKey) {
       console.error('Missing OPENROUTER_API_KEY');
@@ -37,7 +37,10 @@ export async function POST(req: Request) {
       });
     }
 
-    console.log('API Key check - length:', apiKey.length, 'starts with sk-or:', apiKey.startsWith('sk-or'));
+    // Sanitize API Key: remove spaces, quotes, and 'Bearer ' prefix if accidentally included
+    apiKey = apiKey.trim().replace(/^Bearer\s+/i, '').replace(/^["']|["']$/g, '');
+    
+    console.log('API Key sanitized check - length:', apiKey.length, 'starts with sk-or:', apiKey.startsWith('sk-or'));
 
     // 2. Initialize Provider inside the handler to ensure env vars are fresh
     const openrouter = createOpenAI({
@@ -61,7 +64,7 @@ Use as informações acima para responder às perguntas. Se algo não estiver co
 Mantenha um tom de voz profissional, prestativo e alinhado com a personalidade da marca Lynz.
 Sempre responda em Português do Brasil.`;
 
-    const modelId = process.env.OPENROUTER_MODEL || 'google/gemma-7b-it:free';
+    const modelId = process.env.OPENROUTER_MODEL || 'google/gemma-2-9b-it:free';
     console.log('Using AI model:', modelId);
 
     const result = await streamText({
