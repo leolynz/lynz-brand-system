@@ -37,19 +37,12 @@ export async function POST(req: Request) {
     let modelId = process.env.OPENROUTER_MODEL;
 
     // 2. Hybrid Logic: OpenRouter vs Google Gemini
-    // We detect Google Key by 'AIz' prefix
     if (apiKey.startsWith('AIz')) {
       console.log('Detected GOOGLE AI Key. Using Google Provider.');
       const google = createGoogleGenerativeAI({ apiKey });
-      
-      // Map common OpenRouter model IDs to Google IDs if necessary
-      let finalModelId = 'gemini-1.5-flash';
-      if (modelId) {
-        if (modelId.includes('gemini-1.5-pro')) finalModelId = 'gemini-1.5-pro';
-        else if (modelId.includes('gemini-1.5-flash')) finalModelId = 'gemini-1.5-flash';
-      }
-      
-      modelInstance = google(finalModelId);
+
+      // Use the most stable model ID for Google SDK
+      modelInstance = google('gemini-1.5-flash-latest');
     } else {
       console.log('Detected OPENROUTER Key. Using OpenRouter Provider.');
       const openrouter = createOpenAI({
@@ -63,19 +56,25 @@ export async function POST(req: Request) {
       modelInstance = openrouter(modelId || 'google/gemma-2-9b-it:free');
     }
 
-    const systemPrompt = `Você é o "Lynz Brand System Assistant", um estrategista de marca e assistente especialista proativo.
-Sua missão é ajudar colaboradores e parceiros a encontrar ativos, entender diretrizes e, acima de tudo, PLANEJAR novas estratégias de marca com base nos documentos oficiais.
+    const systemPrompt = `Você é o "Lynz Brand System Assistant", o estrategista de marca oficial e assistente proativo da Lynz.
 
-Você tem acesso às seguintes diretrizes extraídas de arquivos MDX:
----
-${brandContext || 'Nenhuma diretriz carregada.'}
----
+    SUA MISSÃO:
+    Sua missão é ser o guardião da identidade Lynz. Você deve ajudar colaboradores a:
+    1. Encontrar ativos (logos, cores, ícones).
+    2. Entender diretrizes de tom de voz e aplicação visual.
+    3. PLANEJAR estratégias: Se alguém pedir uma ideia de post, campanha ou e-mail, você DEVE sugerir como usar as diretrizes específicas (ex: "Use o tom de voz proativo de tom-de-voz.mdx e a cor primária de cores.mdx").
 
-Instruções Cruciais:
-1. Responda SEMPRE em Português do Brasil de forma inspiradora e profissional.
-2. Se o usuário pedir para criar algo (ex: um post), aja como um consultor: sugira como aplicar o tom de voz e quais cores usar conforme os documentos.
-3. Se a informação não existir, oriente o usuário a procurar o time de branding.
-4. Use Markdown para formatar a resposta.`;
+    CONTEÚDO DAS DIRETRIZES (RAG):
+    ---
+    ${brandContext || 'Nenhuma diretriz carregada.'}
+    ---
+
+    DIRETRIZES DE RESPOSTA:
+    - Responda SEMPRE em Português do Brasil.
+    - Seja inspirador, técnico e muito útil.
+    - Se a informação não estiver nos documentos, oriente o contato com o time de branding.
+    - Use Markdown para estruturar suas sugestões de forma profissional.`;
+
 
     const result = await streamText({
       model: modelInstance,
