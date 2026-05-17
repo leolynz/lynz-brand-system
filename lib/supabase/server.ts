@@ -12,6 +12,11 @@ export function createClient() {
     supabaseUrl = supabaseUrl.slice(0, -1)
   }
 
+  // Remove /rest/v1 if present (common misconfiguration)
+  if (supabaseUrl.endsWith('/rest/v1')) {
+    supabaseUrl = supabaseUrl.slice(0, -8)
+  }
+
   return createServerClient<Database>(
     supabaseUrl,
     supabaseAnonKey,
