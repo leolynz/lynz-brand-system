@@ -15,6 +15,10 @@ export function createClient() {
     supabaseUrl = supabaseUrl.slice(0, -8)
   }
 
+  if (typeof window !== 'undefined') {
+    console.log('Supabase URL being used:', supabaseUrl)
+  }
+
   return createBrowserClient<Database>(
     supabaseUrl,
     supabaseAnonKey

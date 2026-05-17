@@ -18,16 +18,19 @@ export function LoginForm() {
     setLoading(true)
     setError(null)
 
-    const { error } = await supabase.auth.signInWithPassword({
+    console.log('Attempting login for:', email)
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     })
 
     if (error) {
       console.error('Login error details:', error)
+      alert(`Erro no Login: ${error.message}`)
       setError(error.message)
       setLoading(false)
     } else {
+      console.log('Login successful, redirecting...', data)
       router.push('/docs/fundamentos/nucleo-da-marca')
       router.refresh()
     }
