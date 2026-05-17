@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { SidebarSection } from './SidebarSection'
 import type { NavigationSection } from '@/lib/types'
 
@@ -9,10 +10,15 @@ interface SidebarProps {
 export function Sidebar({ navigation, currentSlug }: SidebarProps) {
   return (
     <aside className="flex flex-col h-full w-64 shrink-0 border-r border-neutral-200 bg-white">
-      <div className="flex items-center h-14 px-5 border-b border-neutral-200 shrink-0">
-        <span className="text-sm font-semibold tracking-tight text-neutral-900">
-          Lynz Brand System
-        </span>
+      <div className="flex items-center justify-center h-14 px-5 border-b border-neutral-200 shrink-0">
+        <Image
+          src="/images/logos/logo-lynz-white.png"
+          alt="Lynz"
+          width={120}
+          height={32}
+          className="object-contain"
+          priority
+        />
       </div>
 
       <div className="flex-1 overflow-y-auto no-scrollbar py-5 px-3">
