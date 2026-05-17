@@ -44,9 +44,11 @@ Use as informações acima para responder às perguntas. Se algo não estiver co
 Mantenha um tom de voz profissional, prestativo e alinhado com a personalidade da marca Lynz (consulte a seção de tom de voz se disponível).
 Sempre responda em Português do Brasil.`;
 
+    const modelId = process.env.OPENROUTER_MODEL || 'google/gemma-7b-it:free';
+    console.log('Using AI model:', modelId);
+
     const result = await streamText({
-      // Use gemma-7b-it as it's more reliable than 2b for brand guidelines
-      model: openrouter('google/gemma-7b-it:free') as any,
+      model: openrouter(modelId) as any,
       system: systemPrompt,
       messages,
     });
