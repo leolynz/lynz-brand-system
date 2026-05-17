@@ -56,16 +56,31 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  const isAuthRoute = request.nextUrl.pathname === '/login' || 
-                      request.nextUrl.pathname === '/signup'
-  
-  const isPublicRoute = isAuthRoute || 
-                        request.nextUrl.pathname.startsWith('/_next') ||
-                        request.nextUrl.pathname.includes('.') // for favicon, etc.
+  const isLoginPage = request.nextUrl.pathname === '/login'
+  const isSignupPage = request.nextUrl.pathname === '/signup'
+  const isAuthPage = isLoginPage || isSignupPage
 
-  // If not logged in and not on a public route, redirect to login
-  if (!user && !isPublicRoute) {
-    return NextResponse.redirect(new URL('/login', request.url))
+  // Static files and internal Next.js routes
+  if (
+    request.nextUrl.pathname.startsWith('/_next') ||
+    request.nextUrl.pathname.includes('.') ||
+    request.nextUrl.pathname === '/favicon.ico'
+  ) {
+    return response
+  }
+
+  // If not logged in and not on an auth page, redirect to login
+  if (!user && !isAuthPage) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    return NextResponse.redirect(url)
+  }
+
+  // If logged in and on an auth page, redirect to home
+  if (user && isAuthPage) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/docs/fundamentos/nucleo-da-marca'
+    return NextResponse.redirect(url)
   }
 
   // Admin only routes
@@ -77,13 +92,10 @@ export async function middleware(request: NextRequest) {
       .single()
 
     if (profile?.role !== 'admin') {
-      return NextResponse.redirect(new URL('/docs/fundamentos/nucleo-da-marca', request.url))
+      const url = request.nextUrl.clone()
+      url.pathname = '/docs/fundamentos/nucleo-da-marca'
+      return NextResponse.redirect(url)
     }
-  }
-
-  // Redirect from login/signup if already logged in
-  if ((request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup') && user) {
-    return NextResponse.redirect(new URL('/docs/fundamentos/nucleo-da-marca', request.url))
   }
 
   return response
