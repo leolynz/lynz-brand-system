@@ -66,7 +66,7 @@ Mantenha um tom de voz profissional, prestativo e alinhado com a personalidade d
 Sempre responda em Português do Brasil.`;
 
     const modelId = process.env.OPENROUTER_MODEL || 'google/gemma-2-9b-it:free';
-    console.log('Using AI model:', modelId);
+    console.log('Attempting AI stream with model:', modelId);
 
     const result = await streamText({
       model: openrouter(modelId) as any,
@@ -76,11 +76,18 @@ Sempre responda em Português do Brasil.`;
 
     return result.toTextStreamResponse();
   } catch (error: any) {
-    console.error('Error in AI Route:', error);
+    console.error('FULL AI ROUTE ERROR:', error);
+    
+    // Check for specific OpenRouter error patterns
+    const errorMessage = error.message || '';
+    const errorStatus = error.status || 500;
+    
     return new Response(JSON.stringify({ 
-      error: `[PROVIDER_ERROR] ${error.message || 'Internal Server Error'}`
+      error: `[PROVIDER_ERROR] ${errorMessage}`,
+      status: errorStatus,
+      hint: 'Verifique se sua chave do OpenRouter tem créditos e se o modelo selecionado está disponível.'
     }), { 
-      status: 500,
+      status: errorStatus,
       headers: { 'Content-Type': 'application/json' }
     });
   }
