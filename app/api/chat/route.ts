@@ -59,7 +59,8 @@ export async function POST(req: Request) {
         }
       });
       
-      const finalModelId = modelId || 'google/gemma-2-9b-it:free';
+      // Fallback to a very stable free model if the user-provided one fails
+      const finalModelId = modelId || 'google/gemma-7b-it:free';
       modelId = finalModelId;
       modelInstance = openrouter(finalModelId);
     }
