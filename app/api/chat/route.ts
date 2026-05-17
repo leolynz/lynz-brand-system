@@ -27,21 +27,29 @@ export async function POST(req: Request) {
 
     // ULTRA-SANITIZATION: Handle accidental "NAME-key" or "NAME=key" or "Bearer key"
     let apiKey = rawKey.trim()
-      .replace(/^OPENROUTER_API_KEY[-=]/i, '') // Fixes the hyphen/equal error
+      .replace(/^OPENROUTER_API_KEY[-=]/i, '')
       .replace(/^Bearer\s+/i, '')
       .replace(/^["']|["']$/g, '');
     
-    const modelId = process.env.OPENROUTER_MODEL || '';
+    // Sanitize and fix common typos in model ID
+    let modelId = (process.env.OPENROUTER_MODEL || '')
+      .trim()
+      .replace(/^OPENROUTER_MODEL[-=]/i, '')
+      .replace(/genna/i, 'gemma') // Fix common typo
+      .replace(/^["']|["']$/g, '');
+
     let modelInstance: any;
+    let providerName = '';
 
     // 2. Hybrid Logic based on Key Prefix
     if (apiKey.startsWith('AIz')) {
-      console.log('Detected Google Key. Using Google Provider.');
+      providerName = 'Google';
       const google = createGoogleGenerativeAI({ apiKey });
       // Using gemini-1.0-pro as it's more stable for all key types
       modelInstance = google('gemini-1.0-pro');
+      modelId = 'gemini-1.0-pro';
     } else {
-      console.log('Detected OpenRouter/Other Key.');
+      providerName = 'OpenRouter';
       const openrouter = createOpenAI({
         baseURL: 'https://openrouter.ai/api/v1',
         apiKey: apiKey,
@@ -50,8 +58,13 @@ export async function POST(req: Request) {
           'X-Title': 'Lynz Brand System',
         }
       });
-      modelInstance = openrouter(modelId || 'google/gemma-2-9b-it:free');
+      
+      const finalModelId = modelId || 'google/gemma-2-9b-it:free';
+      modelId = finalModelId;
+      modelInstance = openrouter(finalModelId);
     }
+
+    console.log(`Attempting AI stream with ${providerName} using model: ${modelId}`);
 
     const systemPrompt = `Você é o "Lynz Brand System Assistant", estrategista de marca da Lynz.
 Sua missão é ajudar a encontrar ativos e PLANEJAR estratégias com base nas diretrizes abaixo.
@@ -78,7 +91,7 @@ Responda sempre em Português do Brasil.`;
     return new Response(JSON.stringify({ 
       error: `[PROVIDER_ERROR] ${error.message || 'Erro Desconhecido'}`,
       details: `Chave: "${prefix}...", Modelo: "${usedModel}"`,
-      hint: 'Se o erro for "Not Found", o ID do modelo na Vercel pode estar errado (ex: "genna" em vez de "gemma").'
+      hint: 'Se o erro for "Not Found", o ID do modelo na Vercel pode estar errado (ex: "genna" em vez de "gemma"). Verifique também se há hífens no nome da variável.'
     }), { 
       status: 500,
       headers: { 'Content-Type': 'application/json' }
