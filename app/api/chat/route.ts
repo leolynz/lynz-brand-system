@@ -42,10 +42,12 @@ export async function POST(req: Request) {
     
     // 2. Validate Key Format (OpenRouter keys must start with sk-or-v1-)
     if (!apiKey.startsWith('sk-or-')) {
-      console.error('INVALID KEY FORMAT: Key does not start with sk-or-');
+      const actualPrefix = apiKey.substring(0, 3);
+      console.error(`INVALID KEY FORMAT: Key starts with "${actualPrefix}" instead of "sk-or-"`);
       return new Response(JSON.stringify({ 
         error: '[LOCAL_CONFIG] Chave de API Inválida',
-        details: 'A chave configurada não parece ser do OpenRouter. Ela deve começar com "sk-or-v1-". Verifique se você não colou uma chave do Google Gemini (AIza...) por engano.'
+        details: `A chave que o servidor recebeu começa com "${actualPrefix}". Chaves do OpenRouter DEVEM começar com "sk-or-v1-".`,
+        hint: 'Se você já atualizou na Vercel, lembre-se de clicar em REDEPLOY no painel de Deployments para as mudanças valerem.'
       }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
 
