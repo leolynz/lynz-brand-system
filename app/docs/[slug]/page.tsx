@@ -11,10 +11,7 @@ interface PageProps {
   }
 }
 
-export async function generateStaticParams() {
-  const docs = await getAllDocs()
-  return docs.map((doc) => ({ slug: doc.slug }))
-}
+export const dynamic = 'force-dynamic'
 
 export async function generateMetadata({ params }: PageProps) {
   try {
