@@ -20,7 +20,12 @@ const SUGGESTED_PROMPTS = [
 ]
 
 export default function ChatInterface() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading, append } = useChat()
+  const { messages, input, handleInputChange, handleSubmit, isLoading, append } = useChat({
+    onError: (error) => {
+      console.error('Chat error:', error)
+      alert(`Erro no assistente: ${error.message}`)
+    }
+  })
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
