@@ -19,7 +19,12 @@ export async function POST(req: Request) {
     const { messages } = await req.json();
     const brandContext = await getBrandContext();
 
-    console.log('AI Request received. Messages:', messages?.length);
+    // Safe debugging: Log only the keys, never the values!
+    const availableKeys = Object.keys(process.env).filter(k => 
+      k.includes('OPENROUTER') || k.includes('SUPABASE')
+    );
+    console.log('Server-side check - Available keys:', availableKeys);
+    console.log('Brand Context size:', brandContext?.length || 0);
     
     const apiKey = process.env.OPENROUTER_API_KEY;
     
