@@ -40,9 +40,9 @@ export async function POST(req: Request) {
     if (apiKey.startsWith('AIz')) {
       console.log('Detected GOOGLE AI Key. Using Google Provider.');
       const google = createGoogleGenerativeAI({ apiKey });
-
-      // Use the most stable model ID for Google SDK
-      modelInstance = google('gemini-1.5-flash-latest');
+      
+      // Use the most compatible ID. If this fails, the catch block will handle it.
+      modelInstance = google('gemini-1.5-flash');
     } else {
       console.log('Detected OPENROUTER Key. Using OpenRouter Provider.');
       const openrouter = createOpenAI({
