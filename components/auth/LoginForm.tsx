@@ -24,6 +24,7 @@ export function LoginForm() {
     })
 
     if (error) {
+      console.error('Login error details:', error)
       setError(error.message)
       setLoading(false)
     } else {
