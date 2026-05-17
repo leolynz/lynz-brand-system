@@ -40,14 +40,18 @@ export async function POST(req: Request) {
     // Sanitize API Key: remove spaces, quotes, and 'Bearer ' prefix if accidentally included
     apiKey = apiKey.trim().replace(/^Bearer\s+/i, '').replace(/^["']|["']$/g, '');
     
-    // SAFE LOG: Check only parts of the key for verification
-    console.log('API Key Verification:');
-    console.log('- Length:', apiKey.length);
-    console.log('- Starts with:', apiKey.substring(0, 7));
-    console.log('- Ends with:', apiKey.substring(apiKey.length - 4));
-    console.log('- Raw starts with sk-or:', apiKey.startsWith('sk-or'));
+    // 2. Validate Key Format (OpenRouter keys must start with sk-or-v1-)
+    if (!apiKey.startsWith('sk-or-')) {
+      console.error('INVALID KEY FORMAT: Key does not start with sk-or-');
+      return new Response(JSON.stringify({ 
+        error: '[LOCAL_CONFIG] Chave de API Inválida',
+        details: 'A chave configurada não parece ser do OpenRouter. Ela deve começar com "sk-or-v1-". Verifique se você não colou uma chave do Google Gemini (AIza...) por engano.'
+      }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+    }
 
-    // 2. Initialize Provider inside the handler to ensure env vars are fresh
+    console.log('API Key check passed - Prefix:', apiKey.substring(0, 10));
+
+    // 3. Initialize Provider inside the handler to ensure env vars are fresh
     const openrouter = createOpenAI({
       baseURL: 'https://openrouter.ai/api/v1',
       apiKey: apiKey,
@@ -57,8 +61,8 @@ export async function POST(req: Request) {
       }
     });
 
-    const systemPrompt = `Você é o "Lynz Brand System Assistant", um assistente especialista e proativo do sistema de marca da Lynz.
-Sua missão é ajudar colaboradores e parceiros a encontrar ativos, entender diretrizes e planejar novas estratégias de marca com base nos documentos oficiais.
+    const systemPrompt = `Você é o "Lynz Brand System Assistant", um estrategista de marca e assistente especialista proativo.
+Sua missão é ajudar colaboradores e parceiros a encontrar ativos, entender diretrizes e, acima de tudo, PLANEJAR novas estratégias de marca (posts, campanhas, eventos) com base nos documentos oficiais.
 
 Você tem acesso direto ao conteúdo dos seguintes documentos (em formato MDX):
 - Fundamentos: 00-definicao.mdx, golden-circle.mdx, posicionamento.mdx, nucleo-da-marca.mdx
@@ -66,17 +70,16 @@ Você tem acesso direto ao conteúdo dos seguintes documentos (em formato MDX):
 - Identidade Visual: cores.mdx, tipografia.mdx
 - Aplicações: digital.mdx
 
-Aqui está o conteúdo consolidado desses documentos para sua referência:
+Aqui está o conteúdo consolidado para sua referência:
 ---
 ${brandContext || 'Nenhuma diretriz carregada.'}
 ---
 
-Instruções de Comportamento:
-1. Responda SEMPRE em Português do Brasil.
-2. Use as informações acima para embasar suas respostas. Se uma informação não estiver nos documentos, diga honestamente que não tem esse dado específico e sugira consultar o time de branding.
-3. Além de informar, ajude o usuário a PLANEJAR estratégias. Se ele perguntar sobre um post de Instagram, sugira como usar o Tom de Voz (de tom-de-voz.mdx) e as Cores (de cores.mdx).
-4. Mantenha um tom profissional, inspirador e alinhado com a personalidade da marca Lynz.
-5. Quando mencionar uma seção, você pode indicar o nome do arquivo (ex: "conforme detalhado em manifesto.mdx").`;
+Instruções Cruciais:
+1. Responda SEMPRE em Português do Brasil de forma inspiradora e profissional.
+2. Se o usuário pedir para criar algo (ex: um post), aja como um consultor: sugira como aplicar o tom de voz e quais cores usar conforme os documentos.
+3. Se a informação não existir, oriente o usuário a procurar o time de branding.
+4. Seja conciso mas completo. Use Markdown para formatar listas e negritos.`;
 
     const modelId = process.env.OPENROUTER_MODEL || 'google/gemma-7b-it:free';
     console.log('Attempting AI stream with model:', modelId);

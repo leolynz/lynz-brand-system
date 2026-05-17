@@ -23,7 +23,13 @@ export default function ChatInterface() {
   const { messages, input, handleInputChange, handleSubmit, isLoading, append } = useChat({
     onError: (error) => {
       console.error('Chat error:', error)
-      alert(`Erro no assistente: ${error.message}`)
+      try {
+        // Try to parse the error message if it's JSON from our server
+        const errorData = JSON.parse(error.message)
+        alert(`Erro: ${errorData.error}\n\n${errorData.details || errorData.hint || ''}`)
+      } catch {
+        alert(`Erro no assistente: ${error.message}`)
+      }
     }
   })
   const messagesEndRef = useRef<HTMLDivElement>(null)
