@@ -73,11 +73,12 @@ Responda sempre em Português do Brasil.`;
   } catch (error: any) {
     console.error('AI ROUTE ERROR:', error);
     const prefix = (process.env.OPENROUTER_API_KEY || '').substring(0, 4);
+    const usedModel = process.env.OPENROUTER_MODEL || 'google/gemma-2-9b-it:free';
     
     return new Response(JSON.stringify({ 
       error: `[PROVIDER_ERROR] ${error.message || 'Erro Desconhecido'}`,
-      details: `Chave detectada começa com "${prefix}".`,
-      hint: 'Se você colou a chave do OpenRouter, garanta que ela comece com "sk-or". Se a Vercel ainda mostrar "AIza", você precisa deletar a variável, salvar e dar REDEPLOY sem cache.'
+      details: `Chave: "${prefix}...", Modelo: "${usedModel}"`,
+      hint: 'Se o erro for "Not Found", o ID do modelo na Vercel pode estar errado (ex: "genna" em vez de "gemma").'
     }), { 
       status: 500,
       headers: { 'Content-Type': 'application/json' }
