@@ -13,7 +13,8 @@ export async function POST(req: Request) {
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
-      return new Response(JSON.stringify({ error: 'Não autorizado' }), { status: 401 });
+      console.error('Auth Check Failed: No user session found');
+      return new Response(JSON.stringify({ error: '[LOCAL_AUTH] Sessão expirada ou não autorizado' }), { status: 401 });
     }
 
     const { messages } = await req.json();
@@ -30,11 +31,13 @@ export async function POST(req: Request) {
     
     if (!apiKey) {
       console.error('Missing OPENROUTER_API_KEY');
-      return new Response(JSON.stringify({ error: 'Configuração de API (OPENROUTER_API_KEY) ausente no ambiente.' }), { 
+      return new Response(JSON.stringify({ error: '[ENV_CONFIG] Chave OPENROUTER_API_KEY não encontrada' }), { 
         status: 500,
         headers: { 'Content-Type': 'application/json' }
       });
     }
+
+    console.log('API Key check - length:', apiKey.length, 'starts with sk-or:', apiKey.startsWith('sk-or'));
 
     // 2. Initialize Provider inside the handler to ensure env vars are fresh
     const openrouter = createOpenAI({
@@ -71,7 +74,7 @@ Sempre responda em Português do Brasil.`;
   } catch (error: any) {
     console.error('Error in AI Route:', error);
     return new Response(JSON.stringify({ 
-      error: error.message || 'Internal Server Error'
+      error: `[PROVIDER_ERROR] ${error.message || 'Internal Server Error'}`
     }), { 
       status: 500,
       headers: { 'Content-Type': 'application/json' }
