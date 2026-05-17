@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { SidebarSection } from './SidebarSection'
 import type { NavigationSection } from '@/lib/types'
 
@@ -23,7 +24,20 @@ export function Sidebar({ navigation, currentSlug }: SidebarProps) {
         />
       </div>
 
-      <div className="flex-1 overflow-y-auto no-scrollbar py-5 px-3">
+      <div className="shrink-0 px-3 pt-3 pb-2">
+        <Link
+          href="/assets"
+          className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-xs font-medium text-neutral-500 border border-neutral-200 hover:border-neutral-400 hover:text-neutral-900 hover:bg-neutral-50 transition-all duration-150"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" />
+            <path d="M8 21h8M12 17v4" />
+          </svg>
+          Ativos da Marca
+        </Link>
+      </div>
+
+      <div className="flex-1 overflow-y-auto no-scrollbar py-3 px-3">
         {navigation.map((section) => (
           <SidebarSection
             key={section.category}
