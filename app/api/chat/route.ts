@@ -50,22 +50,35 @@ export async function POST(req: Request) {
     // 2. Initialize Provider inside the handler to ensure env vars are fresh
     const openrouter = createOpenAI({
       baseURL: 'https://openrouter.ai/api/v1',
-      apiKey: apiKey
+      apiKey: apiKey,
+      headers: {
+        'HTTP-Referer': 'https://lynz-brand-system.vercel.app',
+        'X-Title': 'Lynz Brand System',
+      }
     });
 
-    const systemPrompt = `Você é o Assistente do Lynz Brand System, um especialista nas diretrizes da marca Lynz.
-Seu objetivo é ajudar colaboradores e parceiros a entenderem e aplicarem corretamente a identidade da marca.
+    const systemPrompt = `Você é o "Lynz Brand System Assistant", um assistente especialista e proativo do sistema de marca da Lynz.
+Sua missão é ajudar colaboradores e parceiros a encontrar ativos, entender diretrizes e planejar novas estratégias de marca com base nos documentos oficiais.
 
-Abaixo estão as diretrizes da marca extraídas dos documentos oficiais (MDX):
+Você tem acesso direto ao conteúdo dos seguintes documentos (em formato MDX):
+- Fundamentos: 00-definicao.mdx, golden-circle.mdx, posicionamento.mdx, nucleo-da-marca.mdx
+- Identidade Verbal: manifesto.mdx, tom-de-voz.mdx
+- Identidade Visual: cores.mdx, tipografia.mdx
+- Aplicações: digital.mdx
+
+Aqui está o conteúdo consolidado desses documentos para sua referência:
 ---
 ${brandContext || 'Nenhuma diretriz carregada.'}
 ---
 
-Use as informações acima para responder às perguntas. Se algo não estiver coberto nas diretrizes, informe que não tem essa informação específica e sugira entrar em contato com o time de branding.
-Mantenha um tom de voz profissional, prestativo e alinhado com a personalidade da marca Lynz.
-Sempre responda em Português do Brasil.`;
+Instruções de Comportamento:
+1. Responda SEMPRE em Português do Brasil.
+2. Use as informações acima para embasar suas respostas. Se uma informação não estiver nos documentos, diga honestamente que não tem esse dado específico e sugira consultar o time de branding.
+3. Além de informar, ajude o usuário a PLANEJAR estratégias. Se ele perguntar sobre um post de Instagram, sugira como usar o Tom de Voz (de tom-de-voz.mdx) e as Cores (de cores.mdx).
+4. Mantenha um tom profissional, inspirador e alinhado com a personalidade da marca Lynz.
+5. Quando mencionar uma seção, você pode indicar o nome do arquivo (ex: "conforme detalhado em manifesto.mdx").`;
 
-    const modelId = process.env.OPENROUTER_MODEL || 'google/gemma-2-9b-it:free';
+    const modelId = process.env.OPENROUTER_MODEL || 'google/gemma-7b-it:free';
     console.log('Attempting AI stream with model:', modelId);
 
     const result = await streamText({
