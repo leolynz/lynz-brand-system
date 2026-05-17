@@ -12,6 +12,7 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
+    "@ai-sdk/google": "^3.0.75",
     "@ai-sdk/openai": "^0.0.30",
     "@ai-sdk/react": "^1.1.1",
     "@supabase/ssr": "^0.10.3",
