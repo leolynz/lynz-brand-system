@@ -31,7 +31,7 @@ export function LoginForm() {
       setLoading(false)
     } else {
       console.log('Login successful, forcing hard redirect...')
-      window.location.href = '/docs/fundamentos/nucleo-da-marca'
+      window.location.href = '/'
     }
   }
 

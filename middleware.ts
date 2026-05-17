@@ -82,7 +82,7 @@ export async function middleware(request: NextRequest) {
   // If logged in and on an auth page, redirect to home
   if (user && isAuthPage) {
     const url = request.nextUrl.clone()
-    url.pathname = '/docs/fundamentos/nucleo-da-marca'
+    url.pathname = '/'
     return NextResponse.redirect(url)
   }
 
@@ -96,7 +96,7 @@ export async function middleware(request: NextRequest) {
 
     if (profile?.role !== 'admin') {
       const url = request.nextUrl.clone()
-      url.pathname = '/docs/fundamentos/nucleo-da-marca'
+      url.pathname = '/'
       return NextResponse.redirect(url)
     }
   }
