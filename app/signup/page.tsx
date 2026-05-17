@@ -2,6 +2,8 @@ import { AuthHeader } from '@/components/auth/AuthHeader'
 import { GradientPanel } from '@/components/auth/GradientPanel'
 import { SignupForm } from '@/components/auth/SignupForm'
 
+export const dynamic = 'force-dynamic'
+
 export default function SignupPage() {
   return (
     <>

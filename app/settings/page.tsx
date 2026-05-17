@@ -2,6 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import { UserList } from './UserList'
 import { redirect } from 'next/navigation'
 
+export const dynamic = 'force-dynamic'
+
 export default async function SettingsPage() {
   const supabase = createClient()
 
