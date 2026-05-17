@@ -30,9 +30,8 @@ export function LoginForm() {
       setError(error.message)
       setLoading(false)
     } else {
-      console.log('Login successful, redirecting...', data)
-      router.push('/docs/fundamentos/nucleo-da-marca')
-      router.refresh()
+      console.log('Login successful, forcing hard redirect...')
+      window.location.href = '/docs/fundamentos/nucleo-da-marca'
     }
   }
 
