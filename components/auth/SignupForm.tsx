@@ -15,6 +15,8 @@ export function SignupForm() {
   const supabase = createClient()
   const router = useRouter()
 
+  const [success, setSuccess] = useState(false)
+
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -40,11 +42,30 @@ export function SignupForm() {
       setError(error.message)
       setLoading(false)
     } else {
-      // In a real app, maybe show a "check your email" message
-      // But for this prototype, let's redirect to login or just show success
-      alert('Conta criada com sucesso! Por favor, faça login.')
-      router.push('/login')
+      setSuccess(true)
     }
+  }
+
+  if (success) {
+    return (
+      <div className="w-full max-w-sm text-center">
+        <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        </div>
+        <h1 className="text-2xl font-semibold text-neutral-900 mb-2">Conta criada!</h1>
+        <p className="text-neutral-500 mb-8">
+          Sua conta foi criada com sucesso. Verifique seu e-mail para confirmar o cadastro (se necessário) ou clique abaixo para entrar.
+        </p>
+        <Link
+          href="/login"
+          className="inline-block w-full bg-neutral-900 text-white text-sm font-medium rounded-lg px-4 py-2.5 hover:bg-neutral-700 transition-colors"
+        >
+          Ir para Login
+        </Link>
+      </div>
+    )
   }
 
   return (

@@ -4,23 +4,24 @@ import { SignupForm } from '@/components/auth/SignupForm'
 
 export default function SignupPage() {
   return (
-    <div className="flex flex-col min-h-screen">
+    <>
       <AuthHeader />
 
+      {/* Main content below the fixed header (56px = h-14) */}
       <div
-        className="flex flex-1"
-        style={{ height: 'calc(100vh - 56px)' }}
+        className="flex"
+        style={{ height: 'calc(100vh - 56px)', marginTop: '56px' }}
       >
-        {/* Painel esquerdo — formulário */}
-        <div className="flex w-[40%] items-center justify-center bg-white px-12 py-10">
+        {/* Left panel — signup form */}
+        <div className="flex items-center justify-center bg-white px-12 w-2/5 shrink-0">
           <SignupForm />
         </div>
 
-        {/* Painel direito — gradiente animado */}
-        <div className="w-[60%]">
+        {/* Right panel — animated gradient */}
+        <div className="flex-1">
           <GradientPanel />
         </div>
       </div>
-    </div>
+    </>
   )
 }

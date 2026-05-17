@@ -14,12 +14,6 @@ export function AuthHeader() {
             priority
           />
         </Link>
-        <Link
-          href="/apps"
-          className="text-sm text-neutral-500 hover:text-neutral-900 transition-colors"
-        >
-          Apps
-        </Link>
       </div>
     </header>
   )
