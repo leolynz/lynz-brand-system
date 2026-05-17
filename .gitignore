@@ -27,3 +27,10 @@ npm-debug.log*
 # editor
 .vscode/
 .idea/
+.vercel
+
+# MCP
+.mcp.json
+
+*storybook.log
+storybook-static
