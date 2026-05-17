@@ -40,16 +40,17 @@ export async function POST(req: Request) {
     // Sanitize API Key: remove spaces, quotes, and 'Bearer ' prefix if accidentally included
     apiKey = apiKey.trim().replace(/^Bearer\s+/i, '').replace(/^["']|["']$/g, '');
     
-    console.log('API Key sanitized check - length:', apiKey.length, 'starts with sk-or:', apiKey.startsWith('sk-or'));
+    // SAFE LOG: Check only parts of the key for verification
+    console.log('API Key Verification:');
+    console.log('- Length:', apiKey.length);
+    console.log('- Starts with:', apiKey.substring(0, 7));
+    console.log('- Ends with:', apiKey.substring(apiKey.length - 4));
+    console.log('- Raw starts with sk-or:', apiKey.startsWith('sk-or'));
 
     // 2. Initialize Provider inside the handler to ensure env vars are fresh
     const openrouter = createOpenAI({
       baseURL: 'https://openrouter.ai/api/v1',
-      apiKey: apiKey,
-      headers: {
-        'HTTP-Referer': 'https://lynz-brand-system.vercel.app',
-        'X-Title': 'Lynz Brand System',
-      }
+      apiKey: apiKey
     });
 
     const systemPrompt = `Você é o Assistente do Lynz Brand System, um especialista nas diretrizes da marca Lynz.
