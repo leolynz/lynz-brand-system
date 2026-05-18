@@ -43,6 +43,11 @@ export async function POST(req: Request) {
       .replace(/genna/i, 'gemma') // Fix common typo
       .replace(/^["']|["']$/g, '');
 
+    // AUTO-UPGRADE: If the model is the old gemma-2-9b, force upgrade to gemma-3
+    if (modelId.includes('gemma-2-9b')) {
+      modelId = 'google/gemma-3-27b-it:free';
+    }
+
     let modelInstance: any;
 
     // 2. Hybrid Logic based on Key Prefix
