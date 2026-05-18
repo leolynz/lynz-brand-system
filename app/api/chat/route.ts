@@ -35,6 +35,8 @@ export async function POST(req: Request) {
       .replace(/^["']|["']$/g, '')
       .trim();
     
+    console.log(`API Key sanitized. Length: ${apiKey.length}, Starts with: ${apiKey.substring(0, 7)}`);
+    
     // Check if key format looks suspicious (OpenRouter keys should start with sk-or-v1-)
     const isGoogleKey = apiKey.startsWith('AIz');
 
