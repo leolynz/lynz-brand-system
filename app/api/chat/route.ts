@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/server';
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
-  let modelId = 'google/gemma-3-27b-it:free'; // Default fallback (Gemma 3)
+  let modelId = 'mistralai/mistral-7b-instruct:free'; // Ultimate stable fallback
   let providerName = 'OpenRouter';
 
   try {
@@ -28,33 +28,35 @@ export async function POST(req: Request) {
       return new Response(JSON.stringify({ error: '[ENV_CONFIG] Chave de API inválida ou não encontrada' }), { status: 500 });
     }
 
-    // ULTRA-SANITIZATION: Handle accidental "NAME-key" or "NAME=key" or "Bearer key"
-    // Also remove any non-alphanumeric characters at the start (except AIz for Google)
+    // ULTRA-SANITIZATION
     let apiKey = rawKey
       .replace(/^OPENROUTER_API_KEY[-=]/i, '')
       .replace(/^Bearer\s+/i, '')
       .replace(/^["']|["']$/g, '')
       .trim();
     
+    // Check if key format looks suspicious (OpenRouter keys should start with sk-or-v1-)
+    const isGoogleKey = apiKey.startsWith('AIz');
+
     // Sanitize and fix common typos in model ID
     modelId = (process.env.OPENROUTER_MODEL || '')
       .trim()
       .replace(/^OPENROUTER_MODEL[-=]/i, '')
-      .replace(/genna/i, 'gemma') // Fix common typo
+      .replace(/genna/i, 'gemma')
       .replace(/^["']|["']$/g, '');
 
-    // AUTO-UPGRADE: If the model is the old gemma-2-9b, force upgrade to gemma-3
-    if (modelId.includes('gemma-2-9b')) {
-      modelId = 'google/gemma-3-27b-it:free';
+    // AUTO-UPGRADE or FIX: 
+    // If empty or gemma-2, use Mistral (more stable) or Gemma 3
+    if (!modelId || modelId.includes('gemma-2-9b')) {
+      modelId = 'mistralai/mistral-7b-instruct:free';
     }
 
     let modelInstance: any;
 
     // 2. Hybrid Logic based on Key Prefix
-    if (apiKey.startsWith('AIz')) {
+    if (isGoogleKey) {
       providerName = 'Google';
       const google = createGoogleGenerativeAI({ apiKey });
-      // Using gemini-1.5-flash as it's the current stable free-tier model for Google
       modelId = 'gemini-1.5-flash';
       modelInstance = google(modelId);
     } else {
@@ -68,10 +70,6 @@ export async function POST(req: Request) {
         }
       });
       
-      // Fallback to a very stable free model if the user-provided one fails
-      if (!modelId) {
-        modelId = 'google/gemma-3-27b-it:free';
-      }
       modelInstance = openrouter(modelId);
     }
 
@@ -97,12 +95,19 @@ Responda sempre em Português do Brasil.`;
   } catch (error: any) {
     console.error('AI ROUTE ERROR:', error);
     const rawKey = process.env.OPENROUTER_API_KEY || '';
-    const prefix = rawKey.substring(0, 4);
+    const prefix = rawKey.substring(0, 6); // More prefix for better debug
+
+    let customError = error.message || 'Erro Desconhecido';
+    let hint = 'Tente usar "mistralai/mistral-7b-instruct:free" nas variáveis.';
+
+    if (!rawKey.startsWith('sk-or-') && !rawKey.startsWith('AIz')) {
+      hint = 'AVISO: Sua chave não parece uma chave do OpenRouter (deve começar com "sk-or-v1-"). Verifique se você não colou uma chave da OpenAI (sk-proj-...) ou do Google (AIz...).';
+    }
 
     return new Response(JSON.stringify({ 
-      error: `[PROVIDER_ERROR] ${error.message || 'Erro Desconhecido'}`,
+      error: `[PROVIDER_ERROR] ${customError}`,
       details: `Modelo: "${modelId}", Provider: ${providerName}, Chave: "${prefix}..."`,
-      hint: 'Erro "Not Found" no OpenRouter geralmente significa que o modelo saiu do ar ou a chave está errada. Tente usar "mistralai/mistral-7b-instruct:free".'
+      hint: hint
     }), { 
       status: 500,
       headers: { 'Content-Type': 'application/json' }
