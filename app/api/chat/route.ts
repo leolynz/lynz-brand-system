@@ -7,6 +7,9 @@ import { createClient } from '@/lib/supabase/server';
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
+  let modelId = 'google/gemma-2-9b-it:free'; // Default fallback
+  let providerName = 'OpenRouter';
+
   try {
     // 1. Check Authentication
     const supabase = createClient();
@@ -32,22 +35,21 @@ export async function POST(req: Request) {
       .replace(/^["']|["']$/g, '');
     
     // Sanitize and fix common typos in model ID
-    let modelId = (process.env.OPENROUTER_MODEL || '')
+    modelId = (process.env.OPENROUTER_MODEL || '')
       .trim()
       .replace(/^OPENROUTER_MODEL[-=]/i, '')
       .replace(/genna/i, 'gemma') // Fix common typo
       .replace(/^["']|["']$/g, '');
 
     let modelInstance: any;
-    let providerName = '';
 
     // 2. Hybrid Logic based on Key Prefix
     if (apiKey.startsWith('AIz')) {
       providerName = 'Google';
       const google = createGoogleGenerativeAI({ apiKey });
-      // Using gemini-1.0-pro as it's more stable for all key types
-      modelInstance = google('gemini-1.0-pro');
-      modelId = 'gemini-1.0-pro';
+      // Using gemini-1.5-flash as it's the current stable free-tier model for Google
+      modelId = 'gemini-1.5-flash';
+      modelInstance = google(modelId);
     } else {
       providerName = 'OpenRouter';
       const openrouter = createOpenAI({
@@ -60,9 +62,10 @@ export async function POST(req: Request) {
       });
       
       // Fallback to a very stable free model if the user-provided one fails
-      const finalModelId = modelId || 'google/gemma-7b-it:free';
-      modelId = finalModelId;
-      modelInstance = openrouter(finalModelId);
+      if (!modelId) {
+        modelId = 'google/gemma-2-9b-it:free';
+      }
+      modelInstance = openrouter(modelId);
     }
 
     console.log(`Attempting AI stream with ${providerName} using model: ${modelId}`);
@@ -86,13 +89,13 @@ Responda sempre em Português do Brasil.`;
     return result.toTextStreamResponse();
   } catch (error: any) {
     console.error('AI ROUTE ERROR:', error);
-    const prefix = (process.env.OPENROUTER_API_KEY || '').substring(0, 4);
-    const usedModel = process.env.OPENROUTER_MODEL || 'google/gemma-2-9b-it:free';
-    
+    const rawKey = process.env.OPENROUTER_API_KEY || '';
+    const prefix = rawKey.substring(0, 4);
+
     return new Response(JSON.stringify({ 
       error: `[PROVIDER_ERROR] ${error.message || 'Erro Desconhecido'}`,
-      details: `Chave: "${prefix}...", Modelo: "${usedModel}"`,
-      hint: 'Se o erro for "Not Found", o ID do modelo na Vercel pode estar errado (ex: "genna" em vez de "gemma"). Verifique também se há hífens no nome da variável.'
+      details: `Modelo: "${modelId}", Chave: "${prefix}...", Provider: ${providerName}`,
+      hint: 'Se o erro for "Not Found", o ID do modelo pode estar errado ou o provedor está fora do ar. Tente configurar OPENROUTER_MODEL para "mistralai/mistral-7b-instruct:free".'
     }), { 
       status: 500,
       headers: { 'Content-Type': 'application/json' }
