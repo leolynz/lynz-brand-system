@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/server';
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
-  let modelId = 'google/gemma-2-9b-it:free'; // Default fallback
+  let modelId = 'google/gemma-3-27b-it:free'; // Default fallback (Gemma 3)
   let providerName = 'OpenRouter';
 
   try {
@@ -22,17 +22,19 @@ export async function POST(req: Request) {
     const { messages } = await req.json();
     const brandContext = await getBrandContext();
     
-    let rawKey = process.env.OPENROUTER_API_KEY || '';
+    let rawKey = (process.env.OPENROUTER_API_KEY || '').trim();
     
-    if (!rawKey) {
-      return new Response(JSON.stringify({ error: '[ENV_CONFIG] Chave de API não encontrada' }), { status: 500 });
+    if (!rawKey || rawKey.length < 10) {
+      return new Response(JSON.stringify({ error: '[ENV_CONFIG] Chave de API inválida ou não encontrada' }), { status: 500 });
     }
 
     // ULTRA-SANITIZATION: Handle accidental "NAME-key" or "NAME=key" or "Bearer key"
-    let apiKey = rawKey.trim()
+    // Also remove any non-alphanumeric characters at the start (except AIz for Google)
+    let apiKey = rawKey
       .replace(/^OPENROUTER_API_KEY[-=]/i, '')
       .replace(/^Bearer\s+/i, '')
-      .replace(/^["']|["']$/g, '');
+      .replace(/^["']|["']$/g, '')
+      .trim();
     
     // Sanitize and fix common typos in model ID
     modelId = (process.env.OPENROUTER_MODEL || '')
@@ -63,7 +65,7 @@ export async function POST(req: Request) {
       
       // Fallback to a very stable free model if the user-provided one fails
       if (!modelId) {
-        modelId = 'google/gemma-2-9b-it:free';
+        modelId = 'google/gemma-3-27b-it:free';
       }
       modelInstance = openrouter(modelId);
     }
@@ -94,8 +96,8 @@ Responda sempre em Português do Brasil.`;
 
     return new Response(JSON.stringify({ 
       error: `[PROVIDER_ERROR] ${error.message || 'Erro Desconhecido'}`,
-      details: `Modelo: "${modelId}", Chave: "${prefix}...", Provider: ${providerName}`,
-      hint: 'Se o erro for "Not Found", o ID do modelo pode estar errado ou o provedor está fora do ar. Tente configurar OPENROUTER_MODEL para "mistralai/mistral-7b-instruct:free".'
+      details: `Modelo: "${modelId}", Provider: ${providerName}, Chave: "${prefix}..."`,
+      hint: 'Erro "Not Found" no OpenRouter geralmente significa que o modelo saiu do ar ou a chave está errada. Tente usar "mistralai/mistral-7b-instruct:free".'
     }), { 
       status: 500,
       headers: { 'Content-Type': 'application/json' }
